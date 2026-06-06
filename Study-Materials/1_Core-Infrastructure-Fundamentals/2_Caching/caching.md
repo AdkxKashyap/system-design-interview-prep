@@ -304,7 +304,7 @@ instead of querying DB every time:
 
 cache profile in Redis
 
-D. Database Cache
+### D. Database Cache
 
 Some databases internally cache:
 
@@ -353,17 +353,20 @@ replication
 
 This connects directly with previous topic.
 
+---
+
+
 # 6. Cache Access Patterns
 
 This is one of the MOST IMPORTANT interview areas.
 
-A. Cache Aside (Lazy Loading)
+### A. Cache Aside (*Lazy Loading*)
 
 MOST COMMON pattern.
 
 Also called:
 
-Lazy Loading
+- Lazy Loading
 
 Flow
 1. Check cache
@@ -372,10 +375,11 @@ Flow
 4. Return response
 
 Example
-GET user:123
+*GET user:123*
 
 Flow:
 
+```
 Cache miss
    ↓
 DB query
@@ -383,397 +387,390 @@ DB query
 Store in cache
    ↓
 Return data
+```
 
-Why Popular?
+- Why Popular?
 
-Application controls caching logic.
+   - Application controls caching logic.
 
-Simple and flexible.
+   - Simple and flexible.
 
-Major Advantage
+- Major Advantage
 
-Only frequently accessed data cached.
+   - Only frequently accessed data cached.
 
-Efficient memory usage.
+   - Efficient memory usage.
 
-Major Problem
+- Major Problem
 
-First request slow:
+   - First request slow:
 
-cache miss penalty
+   - cache miss penalty
 
-Real Production Concern
+- Real Production Concern
 
-Cache stampede.
+   - Cache stampede.
 
-Suppose:
+   - Suppose:
 
-popular cache expires
+      - popular cache expires
 
-Millions of requests simultaneously hit DB.
+      - Millions of requests simultaneously hit DB.
 
-DB overload happens.
+      - DB overload happens.
 
 VERY important interview topic.
 
-When To Use
+- When To Use
 
-Best default strategy for:
+   - Best default strategy for:
 
-read-heavy systems
-social media
-e-commerce
-APIs
+   - read-heavy systems
+   - social media
+   - e-commerce
+   - APIs
 
-Interview Insight
+**Interview Insight**
 
-Most production systems use some form of cache-aside.
+- Most production systems use some form of cache-aside.
 
-B. Read Through Cache
+### B. Read Through Cache
 
-Cache itself fetches data from DB.
+- Cache itself fetches data from DB.
 
-Application only talks to cache.
+- Application only talks to cache.
 
-Flow
+Flow:
+```
 App
  ↓
 Cache
  ↓
 DB
-
+```
 Advantage
 
-Simpler application logic.
+- Simpler application logic.
 
-Problem
+- Problem
 
-Less flexibility.
+   - Less flexibility.
 
-Application loses control.
+   - Application loses control.
 
-Common Use Cases
+- Common Use Cases
 
-Used in:
+   - Used in:
 
-managed caching layers
-ORM abstractions
+   - managed caching layers
+   - ORM abstractions
 
 Less common in interviews compared to cache-aside.
 
-C. Write Through Cache
+### C. Write Through Cache
 
-Write goes:
+- Write goes:
 
-cache + DB simultaneously
+   - cache + DB simultaneously
 
-Why Useful?
+- Why Useful?
 
-Cache always fresh after write.
+   - Cache always fresh after write.
 
-Problem
+- Problem
 
-Higher write latency.
+   - Higher write latency.
 
-Every write waits for:
+   - Every write waits for:
 
-cache update
-DB write
+      - cache update
+      - DB write
 
-Best For
+- Best For
 
-Systems requiring:
+   - Systems requiring:
 
-strong consistency
-high read frequency
+      - strong consistency
+      - high read frequency
 
-Example
+   - Example
 
-User profile updates.
+   - User profile updates.
 
-Need cache immediately updated.
+   - Need cache immediately updated.
 
-D. Write Back Cache (Write Behind)
+### D. Write Back Cache (Write Behind)
 
-Write goes ONLY to cache initially.
+- Write goes ONLY to cache initially.
 
-DB updated asynchronously later.
+- DB updated asynchronously later.
 
-Why Powerful?
+- Why Powerful?
 
-Very fast writes.
+   - Very fast writes.
 
-Problem
+- Problem
 
-Risk of data loss.
+   - Risk of data loss.
 
-If cache crashes before DB flush:
+   - If cache crashes before DB flush:
 
-data lost
+      - data lost
 
-Use Cases
+   - Use Cases
 
-Useful for:
+   - Useful for:
 
-analytics
-logging
-metrics ingestion
+      - analytics
+      - logging
+      - metrics ingestion
 
-NOT ideal for financial systems.
+      - NOT ideal for financial systems.
 
-E. Refresh Ahead Cache
+### E. Refresh Ahead Cache
 
-Cache refreshes proactively before expiration.
+- Cache refreshes proactively before expiration.
 
-Why Useful?
+- Why Useful?
 
-Avoids:
+   - Avoids:
 
-cache misses
-latency spikes
+      - cache misses
+      - latency spikes
 
-Good For
+- Good For
 
-Highly predictable traffic:
+   - Highly predictable traffic:
 
-trending videos
-popular feeds
+   - trending videos
+   - popular feeds
+   
+---
 
 # 7. Cache Eviction Policies
 
-Cache memory limited.
+- Cache memory limited.
 
-Need eviction strategy.
+- Need eviction strategy.
 
-VERY common interview discussion.
 
-A. LRU (Least Recently Used)
+### A. LRU (Least Recently Used)
 
-Remove least recently accessed item.
+- Remove least recently accessed item.
 
-Why Effective?
+- Why Effective?
 
-Assumes:
+   - Assumes:
 
-recently used data likely reused soon
+      - recently used data likely reused soon
 
-Usually true.
+      - Usually true.
 
-Widely Used In
+- Widely Used In
 
-Redis
-OS memory management
-browser caches
+   - Redis
+   - OS memory management
+   - browser caches
 
-Example
-A accessed recently
-B not accessed long time
+- Example
+   - A accessed recently
+   - B not accessed long time
 
-Evict:
+   - *Evict:*
 
-B
+      - **B**
 
-B. LFU (Least Frequently Used)
+### B. LFU (Least Frequently Used)
 
-Remove least frequently accessed item.
+- Remove least frequently accessed item.
 
-Better For
+- *Better For:*
 
-Stable access patterns.
+   - Stable access patterns.
 
-Example:
+- Example:
 
-trending content
+   - trending content
 
-Problem
+- Problem
 
-More tracking overhead.
+   - More tracking overhead.
 
-C. FIFO
+### C. FIFO
 
-Remove oldest item.
+- Remove oldest item.
 
-Simple but less intelligent.
+- Simple but less intelligent.
 
-Rarely ideal.
+- Rarely ideal.
 
-D. TTL (Time To Live)
+### D. TTL (Time To Live)
 
-Expire data after fixed duration.
+- Expire data after fixed duration.
 
-Very important production strategy.
+- Very important production strategy.
 
-Example
-user_profile TTL = 5 mins
+- Example:
+   - user_profile TTL = 5 mins
 
-After expiration:
+- After expiration:
 
-removed automatically
+   - removed automatically
 
-Why Important?
+- Why Important?
 
-Prevents:
+   - Prevents:
 
-stale data forever
+      - stale data forever
 
 # 8. Cache Invalidation — THE HARDEST PART
 
-Famous quote:
+- Famous quote:
 
-“There are only two hard things in Computer Science:
-cache invalidation and naming things.”
+*“There are only two hard things in Computer Science:
+cache invalidation and naming things.”*
 
-Interviewers LOVE this topic.
+- Core Problem
 
-Core Problem
+   - Cache introduces:
 
-Cache introduces:
+   - duplicate copies of data
 
-duplicate copies of data
+   - Now:
 
-Now:
+      - DB updated
+      - Cache stale
 
-DB updated
-Cache stale
+      - Consistency issue appears.
 
-Consistency issue appears.
+- Example
 
-Example
+   - User changes username.
 
-User changes username.
+   - DB:
 
-DB:
+   - new_name
 
-new_name
+   - Cache:
 
-Cache:
+   - old_name
 
-old_name
-
-Users see stale data.
+   - Users see stale data.
 
 # 9. Cache Invalidation Strategies
 
-A. TTL Expiration
+### A. TTL Expiration
 
-Simplest strategy.
+   - Simplest strategy.
 
-Advantage
+   - Advantage
 
-Simple.
+      - Simple.
 
-Problem
+   - Problem
 
-Stale data until expiration.
+      - Stale data until expiration.
 
-Best For
+      - Best For
 
-Eventually consistent systems:
+      - Eventually consistent systems:
 
-feeds
-analytics
-recommendations
+      - feeds
+      - analytics
+      - recommendations
 
-B. Write Invalidate
+### B. Write Invalidate
 
-When DB updated:
+   - When DB updated:
 
-delete cache entry
+      - delete cache entry
 
-Next read:
+      - Next read:
 
-fetch fresh data
+         - fetch fresh data
 
-Very Common
+   - Very Common
 
-Used heavily in production.
+   - Used heavily in production.
 
-Simple and reliable.
+   - Simple and reliable.
 
-C. Write Update
+### C. Write Update
 
-Update cache immediately after DB write.
+   - Update cache immediately after DB write.
 
-Advantage
+   - Advantage
 
-Fresh cache.
+   - Fresh cache.
 
-Problem
+   - Problem
 
-More write complexity.
+      - More write complexity.
 
 # 10. Cache Consistency Tradeoffs
 
-VERY IMPORTANT senior-level topic.
+   - Strong Consistency
 
-Strong Consistency
+   - Cache always latest.
 
-Cache always latest.
+   - Difficult and expensive.
 
-Difficult and expensive.
+   - Eventual Consistency
 
-Eventual Consistency
+      - Small stale window acceptable.
 
-Small stale window acceptable.
+      - Most internet systems choose this.
 
-Most internet systems choose this.
+      - Because:
 
-Why?
+      - scalability more important
+      - perfect consistency expensive
 
-Because:
+      - Example:
 
-scalability more important
-perfect consistency expensive
+      - Instagram like count delayed few seconds:
 
-Example
+      - acceptable
 
-Instagram like count delayed few seconds:
+      - Bank balance stale:
 
-acceptable
-
-Bank balance stale:
-
-unacceptable
+      - unacceptable
 
 ## 11. Cache Stampede (VERY IMPORTANT)
 
-Most candidates miss this.
+   - Problem:
 
-Interviewers LOVE it.
+      - Popular key expires.
 
-Problem
+      - Millions of requests:
 
-Popular key expires.
+      - cache miss simultaneously
 
-Millions of requests:
+      - All hit DB.
 
-cache miss simultaneously
+      - DB collapses.
 
-All hit DB.
+   - Example
+      - celebrity_post
 
-DB collapses.
+      - expires during peak traffic.
 
-Example
-celebrity_post
+      - Massive backend overload.
 
-expires during peak traffic.
-
-Massive backend overload.
-
-Detailed Solutions and Patterns
+      - Detailed Solutions and Patterns
 
 Below are widely used techniques (mixing them gives the strongest production resilience):
 
-A. Request Coalescing / Single-flight
+### A. Request Coalescing / Single-flight
 
-Only a single request performs the DB/cache rebuild while others wait for result.
+- Only a single request performs the DB/cache rebuild while others wait for result.
 
-Implementation notes:
+- Implementation notes:
 
 - Use in-memory single-flight (per app instance) or distributed single-flight (across instances) via a shared lock service.
 - Libraries: Go's `singleflight`, Java/C# equivalents, or custom mutex maps.
 
-Pseudocode (single app-instance single-flight):
+- Pseudocode (single app-instance single-flight):
 
 ```pseudo
 if cache.miss(key):
@@ -786,7 +783,7 @@ if cache.miss(key):
 return value
 ```
 
-B. Distributed Locking with Short TTL
+### B. Distributed Locking with Short TTL
 
 Use a distributed lock (Redis SETNX with TTL, ZooKeeper, etc.) so only one worker rebuilds the cache. Keep lock TTL short and robust to crashes.
 
